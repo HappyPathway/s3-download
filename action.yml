@@ -3,26 +3,29 @@ description: "Uploads artifacts to S3"
 inputs:
   cache_key:
     required: true
-    type: string
+    description: "The key to use for the cache"
   bucket:
     required: true
-    type: string
+    description: "The S3 bucket to download from"
   dest:
+    description: "The destination to download to"
     required: true
-    type: string
   unarchive:
     required: false
-    default: false
-    type: bool
+    default: "false"
+    description: "Unarchive the downloaded file"
 
 runs:
   using: "composite"
   steps:
-    - run: |
+    - name: download
+      id: download
+      shell: bash
+      run: |
         aws s3 cp s3://${{ inputs.bucket }}/${{ inputs.cache_key }} ${{ inputs.dest }}
-    
+
     - name: unarchive source
-      if: ${{ inputs.unarchive }}
+      if: ${{ inputs.unarchive == 'true' }}
       shell: bash
       run: |
         unzip ${{ inputs.dest }}
