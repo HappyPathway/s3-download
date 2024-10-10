@@ -1,0 +1,28 @@
+name: "S3 Upload"
+description: "Uploads artifacts to S3"
+inputs:
+  cache_key:
+    required: true
+    type: string
+  bucket:
+    required: true
+    type: string
+  dest:
+    required: true
+    type: string
+  unarchive:
+    required: false
+    default: false
+    type: bool
+
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        aws s3 cp s3://${{ inputs.bucket }}/${{ inputs.cache_key }} ${{ inputs.dest }}
+    
+    - name: unarchive source
+      if: ${{ inputs.unarchive }}
+      shell: bash
+      run: |
+        unzip ${{ inputs.dest }}
